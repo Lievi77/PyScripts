@@ -44,18 +44,24 @@ TA office hours:
 
 pthread_t ta; //var to hold the TA Thread
 pthread_mutex_t lock; //var to hold the mutex 
-sem_t semaphore; //semaphore
-pthread_t waiting_queue; //use buffer
+sem_t s1,s2,s3;//semaphore
+int In = 0;
+int Out = 0;
+pthread_t student_buffer[3]; //communication buffer
 
 
 void* student(void* args){
 
+    int student_id = *((int *) args);
 
     return NULL;
 }
 
 void* teaching_assistant(void* args){
 
+    int ta_id = *((int *) args);
+
+    
 
     return NULL;
 }
@@ -80,8 +86,10 @@ int main(int argc, char const *argv[]){
 
 
             int ta_id = -1; //TA THREAD
-            sem_init(&semaphore,0,0); //init semaphore to value of 0 i.e, sleeping
-            pthread_create(&ta, NULL, &thread, &ta_id);
+            sem_init(&s1,0,1); //init semaphore to value of 1, number of processes accessing the buffer
+            sem_init(&s2, 0, 0); //Number of full slots, 0 at the beginning
+            sem_init(&s3, 0, 3); //since queue is of size 3, empty slots
+            pthread_create(&ta, NULL, &teaching_assistant, &ta_id); //id will always be -1
             pthread_join(ta, NULL );
 
             /*pthread_t thread_id[n_students]; // n student threads
@@ -92,7 +100,9 @@ int main(int argc, char const *argv[]){
             }*/
 
             pthread_mutex_destroy(&lock); //good practice to destroy mutex when done
-            sem_destroy(&semaphore);
+            sem_destroy(&s1);
+            sem_destroy(&s2);
+            sem_destroy(&s3);
         }
 
     }else{
